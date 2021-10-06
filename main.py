@@ -31,8 +31,6 @@ def get_devman_cheking_works(token, telegram_bot, telegram_chat_id,
     while True:
         response = requests.get(url, headers=headers, params=payload,
                                 timeout=60)
-        print(response.url)
-        pprint(response.json())
         lesson = response.json()
         status = lesson['status']
         if status == 'timout':
@@ -41,7 +39,6 @@ def get_devman_cheking_works(token, telegram_bot, telegram_chat_id,
             payload = {'timestamp': timestamp_to_request}
         elif status == 'found':
             send_telegram_message(lesson, telegram_bot, telegram_chat_id)
-        print(timestamp)
 
 
 def check_server_connection(devman_token, telegram_bot, telegram_chat_id):
