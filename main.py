@@ -23,10 +23,10 @@ def send_telegram_message(devman_lesson, bot, chat_id):
     bot.send_message(text=message, chat_id=chat_id)
 
 
-def get_devman_cheking_works(token, telegram_bot, telegram_chat_id,
+def get_result_cheking_works(devman_token, telegram_bot, telegram_chat_id,
                              timestamp=None):
     url = 'https://dvmn.org/api/long_polling/'
-    headers = {'Authorization': token}
+    headers = {'Authorization': devman_token}
     payload = {'timestamp': timestamp}
     while True:
         response = requests.get(url, headers=headers, params=payload,
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     telegram_bot = telegram.Bot(token=telegram_token)
     while True:
         try:
-            get_devman_cheking_works(devman_token, telegram_bot,
+            get_result_cheking_works(devman_token, telegram_bot,
                                      telegram_chat_id)
         except requests.exceptions.ReadTimeout:
             time.sleep(10)
