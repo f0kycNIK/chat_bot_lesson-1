@@ -34,9 +34,8 @@ def get_result_cheking_works(devman_token, telegram_bot, telegram_chat_id,
         lesson = response.json()
         status = lesson['status']
         if status == 'timout':
-            timestamp_to_request = lesson['request_query'][
-                'timestamp_to_request']
-            payload = {'timestamp': timestamp_to_request}
+            request_timestamp = lesson['request_query']['timestamp_to_request']
+            payload = {'timestamp': request_timestamp}
         elif status == 'found':
             send_telegram_message(lesson, telegram_bot, telegram_chat_id)
 
