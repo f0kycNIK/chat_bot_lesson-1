@@ -34,11 +34,11 @@ def get_result_cheking_works(devman_token, telegram_bot, telegram_chat_id,
         lesson = response.json()
         status = lesson['status']
         if status == 'timout':
-            request_timestamp = lesson['request_query']['timestamp_to_request']
+            request_timestamp = lesson['timestamp_to_request']
             payload = {'timestamp': request_timestamp}
         elif status == 'found':
+            payload = {'timestamp': timestamp}
             send_telegram_message(lesson, telegram_bot, telegram_chat_id)
-
 
 if __name__ == '__main__':
     load_dotenv()
