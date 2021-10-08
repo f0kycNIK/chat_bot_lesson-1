@@ -5,6 +5,25 @@ import requests
 import telegram
 from dotenv import load_dotenv
 
+def check_server_connection(decorate_function):
+    def nn_function(arg1, agr2, arg3):
+        try:
+            decorate_function(arg1, agr2, arg3)
+        except requests.exceptions.ReadTimeout:
+            time.sleep(10)
+            decorate_function(arg1, agr2, arg3)
+    return nn_function
+
+def check_internet_connection(decorate_function):
+    def nn_function(arg1, agr2, arg3):
+        try:
+            decorate_function(arg1, agr2, arg3)
+        except requests.exceptions.ConnectionError:
+            print('проверка соединения')
+            time.sleep(30)
+            decorate_function(arg1, agr2, arg3)
+    return nn_function
+
 
 def send_telegram_message(devman_lesson, bot, chat_id):
     accept_work = devman_lesson['new_attempts'][0]['is_negative']
@@ -22,9 +41,10 @@ def send_telegram_message(devman_lesson, bot, chat_id):
               'следующему уроку.'
     bot.send_message(text=message, chat_id=chat_id)
 
-
+@check_internet_connection
+@check_server_connection
 def get_devman_cheking_works(token, telegram_bot, telegram_chat_id,
-                             timestamp=[]):
+                             timestamp=None):
     url = 'https://dvmn.org/api/long_polling/'
     headers = {'Authorization': token}
     payload = {'timestamp': timestamp}
@@ -41,22 +61,6 @@ def get_devman_cheking_works(token, telegram_bot, telegram_chat_id,
             send_telegram_message(lesson, telegram_bot, telegram_chat_id)
 
 
-def check_server_connection(devman_token, telegram_bot, telegram_chat_id):
-    try:
-        get_devman_cheking_works(devman_token, telegram_bot, telegram_chat_id)
-    except requests.exceptions.ReadTimeout:
-        time.sleep(10)
-        get_devman_cheking_works(devman_token, telegram_bot, telegram_chat_id)
-
-
-def check_internet_connection(devman_token, telegram_bot, telegram_chat_id):
-    try:
-        check_server_connection(devman_token, telegram_bot, telegram_chat_id)
-    except requests.exceptions.ConnectionError:
-        print('проверка соединения')
-        time.sleep(60)
-        check_server_connection(devman_token, telegram_bot, telegram_chat_id)
-
 
 if __name__ == '__main__':
     load_dotenv()
@@ -64,4 +68,4 @@ if __name__ == '__main__':
     telegram_token = os.getenv('TELEGRAM_TOKEN')
     telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
     telegram_bot = telegram.Bot(token=telegram_token)
-    check_internet_connection(devman_token, telegram_bot, telegram_chat_id)
+    get_devman_cheking_works(devman_token, telegram_bot, telegram_chat_id)
