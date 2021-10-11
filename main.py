@@ -1,5 +1,6 @@
 import os
 import time
+from textwrap import dedent
 
 import requests
 import telegram
@@ -7,20 +8,23 @@ from dotenv import load_dotenv
 
 
 def send_telegram_message(devman_lesson, bot, chat_id):
-    accept_work = devman_lesson['new_attempts'][0]['is_negative']
-    lesson_title = devman_lesson['new_attempts'][0]['lesson_title']
-    lesson_url = devman_lesson['new_attempts'][0]['lesson_url']
-    full_lesson_url = f'https://dvmn.org{lesson_url}'
-    if accept_work:
-        message = f'У вас проверили работу "{lesson_title}"' \
-                  '\n\nК сожеление, в работе нашлись ошибки.' \
-                  f'\n{full_lesson_url}'
-        bot.send_message(text=message, chat_id=chat_id)
-        return
-    message = f'У вас проверили работу "{lesson_title}"' \
-              '\n\nПреподователю все понравилось можно приступить к' \
-              'следующему уроку.'
-    bot.send_message(text=message, chat_id=chat_id)
+    for lesson in devman_lesson['new_attempts']:
+        accept_work = lesson['is_negative']
+        lesson_title = lesson['lesson_title']
+        lesson_url = lesson['lesson_url']
+        full_lesson_url = f'https://dvmn.org{lesson_url}'
+        if accept_work:
+            message = f'''\
+            У вас проверили работу "{lesson_title}"\n
+            К сожеление, в работе нашлись ошибки.
+            {full_lesson_url}
+            '''
+        else:
+            message = f'''\
+            У вас проверили работу "{lesson_title}"\n
+            Преподователю все понравилось можно приступить к\
+            следующему уроку.'''
+        bot.send_message(text=dedent(message), chat_id=chat_id)
 
 
 def get_result_cheking_works(devman_token, telegram_bot, telegram_chat_id,
@@ -39,6 +43,7 @@ def get_result_cheking_works(devman_token, telegram_bot, telegram_chat_id,
         elif status == 'found':
             payload = {'timestamp': timestamp}
             send_telegram_message(lesson, telegram_bot, telegram_chat_id)
+
 
 if __name__ == '__main__':
     load_dotenv()
