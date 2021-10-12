@@ -35,6 +35,7 @@ def get_works_result(devman_token, telegram_bot, telegram_chat_id,
     while True:
         response = requests.get(url, headers=headers, params=payload,
                                 timeout=60)
+        response.raise_for_status()
         lesson = response.json()
         status = lesson['status']
         if status == 'timout':
