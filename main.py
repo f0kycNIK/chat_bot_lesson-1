@@ -27,8 +27,8 @@ def send_telegram_message(devman_lesson, bot, chat_id):
         bot.send_message(text=dedent(message), chat_id=chat_id)
 
 
-def get_result_cheking_works(devman_token, telegram_bot, telegram_chat_id,
-                             timestamp=None):
+def get_works_result(devman_token, telegram_bot, telegram_chat_id,
+                     timestamp=None):
     url = 'https://dvmn.org/api/long_polling/'
     headers = {'Authorization': devman_token}
     payload = {'timestamp': timestamp}
@@ -53,8 +53,8 @@ if __name__ == '__main__':
     telegram_bot = telegram.Bot(token=telegram_token)
     while True:
         try:
-            get_result_cheking_works(devman_token, telegram_bot,
-                                     telegram_chat_id)
+            get_works_result(devman_token, telegram_bot,
+                             telegram_chat_id)
         except requests.exceptions.ReadTimeout:
             time.sleep(10)
         except requests.exceptions.ConnectionError:
