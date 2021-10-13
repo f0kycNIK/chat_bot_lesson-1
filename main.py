@@ -39,9 +39,10 @@ def get_works_result(devman_token, telegram_bot, telegram_chat_id,
         lesson = response.json()
         status = lesson['status']
         if status == 'timout':
-            request_timestamp = lesson['timestamp_to_request']
-            payload = {'timestamp': request_timestamp}
+            timestamp = lesson['timestamp_to_request']
+            payload = {'timestamp': timestamp}
         elif status == 'found':
+            timestamp = lesson['last_attempt_timestamp']
             payload = {'timestamp': timestamp}
             send_telegram_message(lesson, telegram_bot, telegram_chat_id)
 
