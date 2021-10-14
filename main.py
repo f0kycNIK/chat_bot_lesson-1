@@ -31,21 +31,24 @@ def get_works_result(devman_token, telegram_bot, telegram_chat_id,
                      timestamp=None):
     url = 'https://dvmn.org/api/long_polling/'
     headers = {'Authorization': devman_token}
-    payload = {'timestamp': timestamp}
     while True:
-        response = requests.get(url, headers=headers, params=payload,
-                                timeout=60)
-        response.raise_for_status()
-        lesson = response.json()
-        status = lesson['status']
-        if status == 'timout':
-            timestamp = lesson['timestamp_to_request']
+        try:
             payload = {'timestamp': timestamp}
-        elif status == 'found':
-            timestamp = lesson['last_attempt_timestamp']
-            payload = {'timestamp': timestamp}
-            send_telegram_message(lesson, telegram_bot, telegram_chat_id)
-
+            response = requests.get(url, headers=headers, params=payload,
+                                    timeout=60)
+            response.raise_for_status()
+            lesson = response.json()
+            status = lesson['status']
+            if status == 'timout':
+                timestamp = lesson['timestamp_to_request']
+            elif status == 'found':
+                timestamp = lesson['last_attempt_timestamp']
+                send_telegram_message(lesson, telegram_bot, telegram_chat_id)
+        except requests.exceptions.ReadTimeout:
+            pass
+        except requests.exceptions.ConnectionError:
+            print('проверка соединения')
+            time.sleep(60)
 
 if __name__ == '__main__':
     load_dotenv()
@@ -53,12 +56,7 @@ if __name__ == '__main__':
     telegram_token = os.getenv('TELEGRAM_TOKEN')
     telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
     telegram_bot = telegram.Bot(token=telegram_token)
-    while True:
-        try:
-            get_works_result(devman_token, telegram_bot,
+
+    get_works_result(devman_token, telegram_bot,
                              telegram_chat_id)
-        except requests.exceptions.ReadTimeout:
-            time.sleep(10)
-        except requests.exceptions.ConnectionError:
-            print('проверка соединения')
-            time.sleep(60)
+
