@@ -1,6 +1,7 @@
 import os
 import time
 from textwrap import dedent
+import logging
 
 import requests
 import telegram
@@ -29,6 +30,7 @@ def send_telegram_message(devman_lesson, bot, chat_id):
 
 def get_works_result(devman_token, telegram_bot, telegram_chat_id,
                      timestamp=None):
+    logging.warning('Бот запущен')
     url = 'https://dvmn.org/api/long_polling/'
     headers = {'Authorization': devman_token}
     while True:
