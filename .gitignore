@@ -12,3 +12,4 @@ venv.bak/
 /config
 *.txt
 !requirements.txt
+/node-modulesgit
