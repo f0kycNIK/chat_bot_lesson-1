@@ -61,7 +61,6 @@ def get_works_result(devman_token, telegram_bot, telegram_chat_id,
                 timestamp = lesson['last_attempt_timestamp']
                 send_telegram_message(lesson, telegram_bot, telegram_chat_id)
         except requests.exceptions.ReadTimeout:
-            logger.warning('Сервер DevMan не отвечает')
             pass
         except requests.exceptions.ConnectionError:
             logger.warning('Отсутсвует интернет соединение')
