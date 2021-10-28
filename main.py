@@ -7,6 +7,17 @@ import requests
 import telegram
 from dotenv import load_dotenv
 
+class TelegramLogsHandler(logging.Handler):
+
+    def __init__(self, tg_bot, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = tg_bot
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
 
 def send_telegram_message(devman_lesson, bot, chat_id):
     for lesson in devman_lesson['new_attempts']:
@@ -30,9 +41,12 @@ def send_telegram_message(devman_lesson, bot, chat_id):
 
 def get_works_result(devman_token, telegram_bot, telegram_chat_id,
                      timestamp=None):
-    logging.warning('Бот запущен')
+    logger = logging.getLogger('Logger')
+    logger.setLevel(logging.WARNING)
+    logger.addHandler(TelegramLogsHandler(telegram_bot, telegram_chat_id))
     url = 'https://dvmn.org/api/long_polling/'
     headers = {'Authorization': devman_token}
+    logger.warning('Бот запущен')
     while True:
         try:
             payload = {'timestamp': timestamp}
@@ -47,9 +61,10 @@ def get_works_result(devman_token, telegram_bot, telegram_chat_id,
                 timestamp = lesson['last_attempt_timestamp']
                 send_telegram_message(lesson, telegram_bot, telegram_chat_id)
         except requests.exceptions.ReadTimeout:
+            logger.warning('Сервер DevMan не отвечает')
             pass
         except requests.exceptions.ConnectionError:
-            print('проверка соединения')
+            logger.warning('Отсутсвует интернет соединение')
             time.sleep(60)
 
 if __name__ == '__main__':
