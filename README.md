@@ -1,6 +1,8 @@
 # Programming vacancies compare
 This program automatical sends out notifications in Telegram  about cheking 
-work  with [devman.org](https://devman.org)
+work  with [devman.org](https://devman.org). Also, this program sends 
+notifications about the crash of the program with information about the error 
+in the telegram.
 
 ## How to install
 

@@ -1,11 +1,12 @@
+import logging
 import os
 import time
 from textwrap import dedent
-import logging
 
 import requests
 import telegram
 from dotenv import load_dotenv
+
 
 class TelegramLogsHandler(logging.Handler):
 
@@ -42,11 +43,11 @@ def send_telegram_message(devman_lesson, bot, chat_id):
 def get_works_result(devman_token, telegram_bot, telegram_chat_id,
                      timestamp=None):
     logger = logging.getLogger('Logger')
-    logger.setLevel(logging.WARNING)
+    logger.setLevel(logging.INFO)
     logger.addHandler(TelegramLogsHandler(telegram_bot, telegram_chat_id))
     url = 'https://dvmn.org/api/long_polling/'
     headers = {'Authorization': devman_token}
-    logger.warning('Бот запущен')
+    logger.info('Бот запущен')
     while True:
         try:
             payload = {'timestamp': timestamp}
@@ -63,8 +64,11 @@ def get_works_result(devman_token, telegram_bot, telegram_chat_id,
         except requests.exceptions.ReadTimeout:
             pass
         except requests.exceptions.ConnectionError:
-            logger.warning('Отсутсвует интернет соединение')
             time.sleep(60)
+        except Exception as err:
+            logger.error('Бот упал с ошибкой')
+            logger.error(err, exc_info=True)
+
 
 if __name__ == '__main__':
     load_dotenv()
@@ -74,5 +78,4 @@ if __name__ == '__main__':
     telegram_bot = telegram.Bot(token=telegram_token)
 
     get_works_result(devman_token, telegram_bot,
-                             telegram_chat_id)
-
+                     telegram_chat_id)
