@@ -62,9 +62,8 @@ def get_works_result(devman_token, telegram_bot, telegram_chat_id,
             pass
         except requests.exceptions.ConnectionError:
             time.sleep(60)
-        except Exception as err:
-            logger.error('Бот упал с ошибкой')
-            logger.exception(err)
+        except Exception:
+            logger.exception('Бот упал с ошибкой:')
 
 
 if __name__ == '__main__':
