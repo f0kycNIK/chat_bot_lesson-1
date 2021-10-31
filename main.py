@@ -42,9 +42,6 @@ def send_telegram_message(devman_lesson, bot, chat_id):
 
 def get_works_result(devman_token, telegram_bot, telegram_chat_id,
                      timestamp=None):
-    logger = logging.getLogger('Logger')
-    logger.setLevel(logging.INFO)
-    logger.addHandler(TelegramLogsHandler(telegram_bot, telegram_chat_id))
     url = 'https://dvmn.org/api/long_polling/'
     headers = {'Authorization': devman_token}
     logger.info('Бот запущен')
@@ -76,6 +73,10 @@ if __name__ == '__main__':
     telegram_token = os.getenv('TELEGRAM_TOKEN')
     telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
     telegram_bot = telegram.Bot(token=telegram_token)
+
+    logger = logging.getLogger('Logger')
+    logger.setLevel(logging.INFO)
+    logger.addHandler(TelegramLogsHandler(telegram_bot, telegram_chat_id))
 
     get_works_result(devman_token, telegram_bot,
                      telegram_chat_id)
